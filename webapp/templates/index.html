@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Regex Excellence</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+    <style>
+      /* Additional CSS styles specific to the index page */
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #ffc0cb; /* Light pink background */
+        color: white;
+        margin: 0;
+        padding: 0;
+      }
+
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #975475; /* Pink form background */
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+        color: #fff; /* White text */
+        text-align: center;
+        font-size: 32px;
+        margin-bottom: 20px;
+      }
+
+      label {
+        font-weight: bold;
+        color: #fff; /* White text */
+      }
+
+      input[type="text"],
+      input[type="email"] {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+        background-color: #fff; /* White input background */
+        color: white;
+      }
+
+      input[type="submit"] {
+        background-color: #f148a2; /* Pink button background */
+        color: #fff; /* White text */
+        border: none;
+        border-radius: 4px;
+        padding: 10px 20px;
+        cursor: pointer;
+      }
+
+      input[type="submit"]:hover {
+        background-color: #f40ea7; /* Darker pink on hover */
+      }
+
+      .result-container {
+        margin-top: 20px;
+        display: none; /* Hide the result container initially */
+      }
+
+      .result-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+      }
+
+      .result-table th,
+      .result-table td {
+        padding: 8px;
+        border: 1px solid #ddd;
+        text-align: left;
+        color: #fff; /* White text */
+      }
+
+      .result-table th {
+        background-color: #ff69b4; /* Pink for table header */
+      }
+
+      /* Highlight style for matched portions */
+      .matched {
+        color: white;
+      }
+
+      #ttl {
+        color: #fff; /* White text */
+        text-align: center;
+      }
+
+      .email-link {
+        color: #fff; /* White text */
+        text-align: center;
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1 id="ttl">Regex Excellence</h1>
+      <form id="regexForm" action="/" method="post">
+        <label for="email">Test String:</label>
+        <input type="text" id="test_string" name="test_string" required /><br /><br />
+        <label for="regex">Regular Expression:</label>
+        <input type="text" id="regex" name="regex" required /><br /><br />
+        <input type="submit" value="Match" />
+      </form>
+
+      <div class="result-container">
+        <h2>Match Result</h2>
+        <p id="originalInput">Original Input: <strong></strong></p>
+        <table class="result-table">
+          <thead>
+            <tr>
+              <th>Matched Portion</th>
+            </tr>
+          </thead>
+          <tbody id="matchedPortions"></tbody>
+        </table>
+      </div>
+
+      <!-- Email Validation Form -->
+      <h1>Email Validation</h1>
+      <form id="emailValidationForm">
+        <label for="email">Email Address:</label>
+        <input type="email" id="email" name="email" required /><br /><br />
+        <input type="submit" value="Validate" />
+      </form>
+      <div class="result-container" id="emailValidationOutput"></div>
+    </div>
+
+    <script>
+   
+      document.addEventListener("DOMContentLoaded", function () {
+ 
+        document.getElementById("regexForm").addEventListener("submit", function (event) {
+
+          event.preventDefault();
+
+          var testString = document.getElementById("test_string").value;
+          var regexPattern = document.getElementById("regex").value;
+
+          var matches = testString.match(new RegExp(regexPattern, "g"));
+          var originalInput = document.querySelector("#originalInput strong");
+          originalInput.textContent = ""; 
+          var index = 0;
+          matches.forEach(function (match) {
+            var indexOfMatch = testString.indexOf(match, index);
+            
+            if (indexOfMatch > index) {
+              var nonMatchedText = document.createTextNode(testString.substring(index, indexOfMatch));
+              originalInput.appendChild(nonMatchedText);
+            }
+           
+            var matchedSpan = document.createElement("span");
+            matchedSpan.classList.add("matched");
+            matchedSpan.textContent = match;
+            originalInput.appendChild(matchedSpan);
+            index = indexOfMatch + match.length; 
+          });
+       
+          if (index < testString.length) {
+            var nonMatchedText = document.createTextNode(testString.substring(index));
+            originalInput.appendChild(nonMatchedText);
+          }
+
+          var matchedPortions = document.getElementById("matchedPortions");
+          matchedPortions.innerHTML = ""; 
+          matches.forEach(function (match) {
+            var row = document.createElement("tr");
+            var cell = document.createElement("td");
+            cell.textContent = match;
+            row.appendChild(cell);
+            matchedPortions.appendChild(row);
+          });
+
+          document.querySelector(".result-container").style.display = "block";
+        });
+
+        document.getElementById("emailValidationForm").addEventListener("submit", function (event) {
+          event.preventDefault();
+
+          var email = document.getElementById("email").value;
+          var isValid = validateEmail(email);
+
+          var emailValidationOutput = document.getElementById("emailValidationOutput");
+          emailValidationOutput.innerHTML = "<h2>Validation Result</h2>";
+          if (isValid) {
+            emailValidationOutput.innerHTML += "<p>Email is valid.</p>";
+          } else {
+            emailValidationOutput.innerHTML += "<p>Email is invalid.</p>";
+          }
+
+          emailValidationOutput.style.display = "block";
+        });
+      });
+
+      function validateEmail(email) {
+        return email.includes("@");
+      }
+    </script>
+  </body>
+</html>
